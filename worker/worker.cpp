@@ -13,6 +13,9 @@
 #include "socket_handler.h"
 #include "processing_handler.h"
 
+#define SERVER_ADDRESS "127.0.0.1"
+#define SERVER_PORT 1111
+
 //void socketThread(std::vector<int>, int);
 //void processingThread(std::vector<int>, int);
 
@@ -59,7 +62,6 @@ int main(int argc, char *argv[]) {
 	}
 
 	//Create the socket used for communication with the server.
-	/*
 	struct sockaddr_in serv_addr;
 	int client_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (client_fd < 0) {
@@ -68,9 +70,9 @@ int main(int argc, char *argv[]) {
 	}
 
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(1111);
+	serv_addr.sin_port = htons(SERVER_PORT);
 
-	if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
+	if (inet_pton(AF_INET, SERVER_ADDRESS, &serv_addr.sin_addr) <= 0) {
 		std::cerr << "Error: Invalid address/address not supported." << std::endl;
 		return -1;
 	}
@@ -80,11 +82,10 @@ int main(int argc, char *argv[]) {
 		std::cerr << "Error: connection failed." << std::endl;
 		return -1;
 	}
-	*/
 
 	std::vector<int> socket_thread_fds;
 	socket_thread_fds.push_back(main_socket_fds[0]);
-	//socket_thread_fds.push_back(client_fd);
+	socket_thread_fds.push_back(client_fd);
 	socket_thread_fds.push_back(processing_socket_fds[0]);
 
 	std::vector<int> processing_thread_fds;
@@ -106,15 +107,13 @@ int main(int argc, char *argv[]) {
 	std::string input = "";
 	std::cout << "Waiting on user input..." << std::endl;
 	while(true) {
-		std::cin >> input;
+		//std::cin >> input;
+		getline(std::cin, input);
 		if (input == "exit") {
 			std::cout << "Exiting program." << std::endl;
 			break;
 		} else {
 			std::cout << "User string: " << input << std::endl;
-
-			//TEMP: pseudo packet write to socket thread for pseudo server message
-			write(main_socket_fds[1], input.data(), input.length());
 		}
 	}
 

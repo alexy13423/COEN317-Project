@@ -37,7 +37,7 @@ void SocketHandler::socketThread() {
 			std::cerr << "Poll returned 0 events? (socket)" << std::endl;
 			break;
 		}
-		if (pfds[0].revents == POLLIN) {
+		if (pfds[0].revents == POLLIN) { //main thread
 			readLength = read(pfds[0].fd, buffer, 1024);
 			if (readLength < 0) {
 				std::cerr << "Error reading from main pipe." << std::endl;
@@ -47,28 +47,39 @@ void SocketHandler::socketThread() {
 				if (pipeValue == "exit") {
 					std::cout << "Terminating socket thread." << std::endl;
 					break;
-				} else { //TEMPORARY PSEUDOMESSAGE HANDLER
+				} /*else { //TEMPORARY PSEUDOMESSAGE HANDLER
 					write(socket_processing_fd, pipeValue.data(), pipeValue.length());
-				}
+				} */
 			}
 			memset(buffer, 0, 1024);
 		}
-		if (pfds[1].revents == POLLIN) {
+		if (pfds[1].revents == POLLIN) { //server message thread
 			readLength = read(pfds[1].fd, buffer, 1024);
 			if (readLength < 0) {
 				std::cerr << "Error reading from message." << std::endl;
+			} else if (readLength == 0) {
+				std::cout << "Server seems to have shut down, shutting down client" << std::endl;
+				exit(0);
 			} else {
 				std::string pipeValue(buffer);
-				std::cout << "Message output: " << pipeValue << std::endl;
-				if (pipeValue == "exit") {
-					std::cout << "Terminating socket thread." << std::endl;
-					break;
-				}
+				//std::cout << "Message output from server: " << pipeValue << std::endl;
+				write(socket_processing_fd, pipeValue.data(), pipeValue.length());
 			}
 			memset(buffer, 0, 1024);
 		}
 		if (pfds[2].revents == POLLIN) {
 			//TODO: Handler to send message to server.
+			readLength = read(pfds[2].fd, buffer, 1024);
+			if (readLength < 0) {
+				std::cerr << "Error reading from message." << std::endl;
+			} else {
+				std::string pipeValue(buffer);
+				std::cout << "Sending message to server: " << pipeValue << std::endl;
+
+				char *message_to_server = pipeValue.data();
+				int server_fd = socket_thread_fds.at(1);
+				send(server_fd, message_to_server, strlen(message_to_server), 0);
+			}
 			memset(buffer, 0, 1024);
 		}
 		/*

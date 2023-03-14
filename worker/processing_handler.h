@@ -14,18 +14,19 @@ class ProcessHandler {
 	private:
 		std::vector<int> process_thread_fds;
 		int processing_socket_fd;
+		int client_id;
 };
 
 int handlePreprocessing(embeddedmz::CFTPClient*, int, std::string, pqxx::connection*);
-int handleCoordinateDetection(embeddedmz::CFTPClient*, int, int, pqxx::connection*);
-//int handleDrawing(embeddedmz::CFTPClient*, int, int, pqxx::connection*);
-//int handlePostprocessing(embeddedmz::CFTPClient*, int, pqxx::connection*);
+int handleCoordinateDetection(embeddedmz::CFTPClient*, int, int, pqxx::connection*, int);
+int handleDrawing(embeddedmz::CFTPClient*, int, int, pqxx::connection*, int);
+int handlePostprocessing(embeddedmz::CFTPClient*, int, pqxx::connection*);
 
 std::string getFrame(embeddedmz::CFTPClient*, int, int);
 std::string getVideo(embeddedmz::CFTPClient*, int, std::string);
-int uploadFrame(embeddedmz::CFTPClient*, int, std::string);
-int uploadVideo(embeddedmz::CFTPClient*, int, std::string);
-int getFrameSet(embeddedmz::CFTPClient*, int);
+int uploadFrame(embeddedmz::CFTPClient*, int, int);
+int uploadVideo(embeddedmz::CFTPClient*, int);
+int getFrameSet(embeddedmz::CFTPClient*, int, int);
 int uploadFrameSet(embeddedmz::CFTPClient*, int);
 
 #endif
