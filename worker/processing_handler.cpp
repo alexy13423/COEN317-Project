@@ -562,7 +562,8 @@ std::string getFrame(embeddedmz::CFTPClient *ftp_client, int jobId, int frameNum
 
 std::string getVideo(embeddedmz::CFTPClient *ftp_client, int jobId, std::string videoName) {
     std::stringstream filePath;
-    filePath << "/" << jobId << "/input/" << videoName;
+    //filePath << "/" << jobId << "/input/" << videoName;
+	filePath << "/inbox/" << videoName;
     std::string filePathString = filePath.str();
     std::cout << "Video to download: " << filePathString << std::endl;
 
